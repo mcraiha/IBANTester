@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="Description" content="IBAN Tester - Free, open, no ads and respects your privacy">
+    <meta name="theme-color" content="#5dadec"/>
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="mvp.css">
+    <!--<link rel="manifest" href="manifest.webmanifest">
+    <link rel="apple-touch-icon" href="icons-192_apple.png">-->
+    <title>IBAN Tester - Free, open, no ads and respects your privacy</title>
+  </head>
+  <body>
+    <noscript>
+      <strong>IBAN Tester requires Javascript</strong>
+    </noscript>
+    <main>
+      <section>
+        <header>
+          <h1>IBAN Tester</h1>
+        </header>
+
+        <form>
+          <label for="ibanCode" title="IBAN Code">IBAN Code:</label>
+          <input id="ibanCode" placeholder="FR76 3000 6000 0112 3456 7890 189" disabled>
+        </form>
+      </section>
+
+      <hr>
+
+      <section>
+        <table>
+          <thead>
+            <tr>
+                <th>IBAN</th>
+                <th>Is valid</th>
+                <th>Country</th>
+                <th>Possible error</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+                <td id="singleIBAN"></td>
+                <td id="singleIsValid"></td>
+                <td id="singleCountry"></td>
+                <td id="singleError"></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+    </main>
+
+    <footer>
+      <hr>
+      <p>
+        <small>
+            IBAN Tester - <i id="buildinfo"></i> - <a href="about.html">About</a>
+        </small>
+      </p>
+    </footer>
+  </body>
+  <script type="module" src="index.js"></script>
+</html>
