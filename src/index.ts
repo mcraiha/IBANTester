@@ -425,7 +425,7 @@ export function testIBAN(event: Event): void {
         inputString = inputString.replace(/\s/g, "");
 
         // Write IBAN
-        writeSingleIBAN(inputString);
+        writeSingleIBAN(makeStringSafe(inputString));
 
         // Only alphanumericals are allowed
         if (!inputString.match(/^[0-9A-Z ]+$/)) {
@@ -529,6 +529,18 @@ export function checkChecksum(input: string): boolean {
     currentModulo = finalNumber % 97;
 
     return (currentModulo === 1);
+}
+
+export function makeStringSafe(syote: string): string {
+    const removeThese: string[] = ["\\<", "\\>", "\\[", "\\]", '\\"'];
+    let modify: string = syote;
+    
+    for (const remove of removeThese) {
+        const removeRegExp: RegExp = new RegExp(remove, 'g');
+        modify = modify.replace(removeRegExp, "");
+    }
+
+    return modify;
 }
 
 /*
