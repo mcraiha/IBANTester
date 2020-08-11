@@ -419,12 +419,16 @@ const errorInvalidChecksum: string = "Invalid checksum!";
  */
 
 export function testIBAN(event: Event): void {
-    const inputString: string = (<HTMLInputElement>event.target).value;
+    let inputString: string = (<HTMLInputElement>event.target).value;
     if (inputString) {
+        // Remove all whitespace
+        inputString = inputString.replace(/\s/g, "");
+
+        // Write IBAN
         writeSingleIBAN(inputString);
 
         // Only alphanumericals are allowed
-        if (!inputString.match(/^[0-9A-Z]+$/)) {
+        if (!inputString.match(/^[0-9A-Z ]+$/)) {
             writeSingleIsValid(crossMarkEmoji);
             writeSingleCountry("");
             writeSingleError(errorAlphaNumericals);
