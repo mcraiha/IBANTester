@@ -120,7 +120,124 @@ enum Country
 }
 
 type codeToCountry = Record<string, Country>;
-const codeToCountryMap: codeToCountry = { "FI": Country.Finland };
+const codeToCountryMap: codeToCountry = {
+    "AD": Country.Andorra,
+    "AE": Country.UnitedArabEmirates,
+    "AL": Country.Albania,
+    "AO": Country.Angola,
+    "AT": Country.Austria,
+    "AZ": Country.Azerbaijan,
+    
+    "BA": Country.BosniaAndHerzegovina,
+    "BE": Country.Belgium,
+    "BF": Country.BurkinaFaso,
+    "BG": Country.Bulgaria,
+    "BH": Country.Bahrain,
+    "BI": Country.Burundi,
+    "BJ": Country.Benin,
+    "BR": Country.Brazil,
+    "BY": Country.Belarus,
+    
+    "CG": Country.Congo,
+    "CH": Country.Switzerland,
+    "CI": Country.IvoryCoast,
+    "CM": Country.Cameroon,
+    "CR": Country.CostaRica,
+    "CV": Country.CapeVerde,
+    "CY": Country.Cyprus,
+    "CZ": Country.CzechRepublic,
+    
+    "DE": Country.Germany,
+    "DK": Country.Denmark,
+    "DO": Country.DominicanRepublic,
+    "DZ": Country.Algeria,
+    
+    "EE": Country.Estonia,
+    "EG": Country.Egypt,
+    "ES": Country.Spain,
+    
+    "FI": Country.Finland,
+    "FO": Country.FaroeIslands,
+    "FR": Country.France,
+    
+    "GA": Country.Gabon,
+    "GB": Country.UnitedKingdom,
+    "GE": Country.Georgia,
+    "GG": Country.Guernsey,
+    "GI": Country.Gibraltar,
+    "GL": Country.Greenland,
+    "GR": Country.Greece,
+    "GT": Country.Guatemala,
+    
+    "HR": Country.Croatia,
+    "HU": Country.Hungary,
+
+    "IE": Country.Ireland,
+    "IL": Country.Israel,
+    "IM": Country.IsleOfMan,
+    "IQ": Country.Iraq,
+    "IR": Country.Iran,
+    "IS": Country.Iceland,
+    "IT": Country.Italy,
+
+    "JE": Country.Jersey,
+    "JO": Country.Jordan,
+
+    "KW": Country.Kuwait,
+    "KZ": Country.Kazakhstan,
+
+    "LB": Country.Lebanon,
+    "LC": Country.SaintLucia,
+    "LI": Country.Liechtenstein,
+    "LT": Country.Lithuania,
+    "LU": Country.Luxembourg,
+    "LV": Country.Latvia,
+
+    "MC": Country.Monaco,
+    "MD": Country.Moldova,
+    "ME": Country.Montenegro, 
+    "MG": Country.Madagascar,
+    "MK": Country.NorthMacedonia,
+    "ML": Country.Mali,
+    "MR": Country.Mauritania,
+    "MT": Country.Malta,
+    "MU": Country.Mauritius,
+    "MZ": Country.Mozambique,
+
+    "NL": Country.Netherlands,
+    "NO": Country.Norway,
+
+    "PK": Country.Pakistan,
+    "PL": Country.Poland,
+    "PS": Country.Palestine,
+    "PT": Country.Portugal,
+
+    "QA": Country.Qatar,
+
+    "RO": Country.Romania,
+    "RS": Country.Serbia,
+
+    "SA": Country.SaudiArabia,
+    "SC": Country.Seychelles,
+    "SE": Country.Sweden,
+    "SI": Country.Slovenia,
+    "SK": Country.Slovakia,
+    
+    "SM": Country.SanMarino,
+    "SN": Country.Senegal,
+    "ST": Country.SaoTomeAndPrincipe,
+
+    "TL": Country.TimorLeste,
+    "TN": Country.Tunisia,
+    "TR": Country.Turkey,
+
+    "UA": Country.Ukraine,
+    
+    "VA": Country.VaticanCityState,
+    "VG": Country.BritishVirginIslands,
+
+    "XK": Country.Kosovo,
+};
 
 interface CountryDefinition {
     ibanLength: number;
