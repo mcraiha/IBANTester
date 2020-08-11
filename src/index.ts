@@ -400,6 +400,32 @@ if (ibanCode) {
     ibanCode.addEventListener('input', testIBAN);
 }
 
+const ibanCodeLabel: HTMLElement = document.getElementById('ibanCodeLabel')!;
+
+const ibanCodes: HTMLElement = document.getElementById('ibanCodes')!;
+if (ibanCodes) {
+    const ibanCodesInput = <HTMLInputElement>ibanCodes;
+    ibanCodesInput.disabled = false;
+    ibanCodes.addEventListener('input', testIBANs);
+}
+
+const ibanCodesLabel: HTMLElement = document.getElementById('ibanCodesLabel')!;
+
+const singlemodeselectedparent: HTMLElement = document.getElementById('singlemodeselectedparent')!;
+const multimodeselectedparent: HTMLElement = document.getElementById('multimodeselectedparent')!;
+
+const singleModeLink: HTMLElement = document.getElementById('singlemodelink')!;
+if (singleModeLink) {
+    const singleModeLinkInput = <HTMLInputElement>singleModeLink;
+    singleModeLinkInput.addEventListener('click', () => selectSingleMode());
+}
+
+const multiModeLink: HTMLElement = document.getElementById('multimodelink')!;
+if (multiModeLink) {
+    const multiModeLinkInput = <HTMLInputElement>multiModeLink;
+    multiModeLinkInput.addEventListener('click', () => selectMultiMode());
+}
+
 const singleIBAN: HTMLElement = document.getElementById('singleIBAN')!;
 const singleIsValid: HTMLElement = document.getElementById('singleIsValid')!;
 const singleCountry: HTMLElement = document.getElementById('singleCountry')!;
@@ -421,7 +447,13 @@ if (parameters.has('iban')) {
     const inputIBAN: string = parameters.get('iban')!;
     const ibanCodeInput = <HTMLInputElement>ibanCode;
     ibanCodeInput.value = inputIBAN;
+    selectSingleMode();
     testSingleIBAN(inputIBAN);
+}
+else
+{
+    // We default to single mode
+    selectSingleMode();
 }
 
 /** 
@@ -429,6 +461,11 @@ if (parameters.has('iban')) {
  */
 
 export function testIBAN(event: Event): void {
+    const inputString: string = (<HTMLInputElement>event.target).value;
+    testSingleIBAN(inputString);
+}
+
+export function testIBANs(event: Event): void {
     const inputString: string = (<HTMLInputElement>event.target).value;
     testSingleIBAN(inputString);
 }
@@ -559,6 +596,28 @@ export function makeStringSafe(syote: string): string {
 /*
 * DOM modifications
 */
+
+export function selectSingleMode(): void {
+    ibanCodeLabel.hidden = false;
+    ibanCode.hidden = false;
+
+    ibanCodesLabel.hidden = true;
+    ibanCodes.hidden = true;
+
+    singlemodeselectedparent.hidden = false;
+    multimodeselectedparent.hidden = true;
+}
+
+export function selectMultiMode(): void {
+    ibanCodeLabel.hidden = true;
+    ibanCode.hidden = true;
+
+    ibanCodesLabel.hidden = false;
+    ibanCodes.hidden = false;
+
+    singlemodeselectedparent.hidden = true;
+    multimodeselectedparent.hidden = false;
+}
 
 export function clearSingle(): void {
     singleIBAN.innerHTML = "";
