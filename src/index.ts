@@ -239,6 +239,35 @@ const countryToDefinitionMap: EnumDictionary<Country, CountryDefinition | undefi
     [Country.Unknown]: { ibanLength: 0, name: "Unknown"},
 }
 
+type ibanCharToNumber = Record<string, string>;
+const ibanCharToNumberMap: ibanCharToNumber = { 
+    "A": "10",
+    "B": "11",
+    "C": "12",
+    "D": "13",
+    "E": "14",
+    "F": "15",
+    "G": "16",
+    "H": "17",
+    "I": "18",
+    "J": "19",
+    "K": "20",
+    "L": "21",
+    "M": "22",
+    "N": "23",
+    "O": "24",
+    "P": "25",
+    "Q": "26",
+    "R": "27",
+    "S": "28",
+    "T": "29",
+    "U": "30",
+    "V": "31",
+    "W": "32",
+    "X": "33",
+    "Y": "34",
+    "Z": "35",
+};
 
 /** 
  * Init begins
@@ -266,6 +295,7 @@ const errorAlphaNumericals: string = "Only alphanumerics are allowed!";
 const errorCountry: string = "Cannot identify country code!";
 const errorCodeTooShort: string = "IBAN is too short!";
 const errorCodeTooLong: string = "IBAN is too long!";
+const errorInvalidChecksum: string = "Invalid checksum!";
 
 /** 
  * Init ends
@@ -306,6 +336,12 @@ export function testIBAN(event: Event): void {
             return;
         }
 
+        if (!checkChecksum(inputString)) {
+            writeSingleIsValid(crossMarkEmoji);
+            writeSingleError(errorInvalidChecksum);
+            return;
+        }
+
         writeSingleIsValid(checkMarkEmoji);
         writeSingleError("");
     } 
@@ -316,7 +352,7 @@ export function testIBAN(event: Event): void {
 }
 
 export function figureOutCountry(input: string) : Country {
-    if (input.length < 3) {
+    if (input.length < 2) {
         return Country.Unknown; 
     }
     const twoCharCountryCode: string = input.substring(0, 2);
@@ -342,6 +378,41 @@ export function checkLength(input: string, country: Country): LengthCheckResult 
         return LengthCheckResult.NotEnough;
     }
 }
+
+export function checkChecksum(input: string): boolean {
+    // Reorder, e.g. GB82 WEST 1234 5698 7654 32 -> WEST 1234 5698 7654 32GB 82
+    let reordered: string = input.substring(4) + input.substring(0, 4);
+
+    // Replace alphabets with numbers, e.g. WEST 1234 5698 7654 32GB 82 -> 32142829123456987654321611 82	
+    for (const key of Object.keys(ibanCharToNumberMap)) {
+        if (reordered.includes(key)) {
+            const searchRegExp = new RegExp(key, 'g');
+            reordered = reordered.replace(searchRegExp, ibanCharToNumberMap[key]);
+        }
+    }
+
+    // Do modulo check (BigInt would be nice)
+    const firstNineDigits: string = reordered.substring(0, 9);
+    reordered = reordered.substring(9);
+    const firstNumber: number = Number(firstNineDigits);
+    let currentModulo: number = firstNumber % 97;
+    while (reordered.length > 6) {
+        const currentNumberAsString: string = currentModulo + reordered.substring(0, 7);
+        reordered = reordered.substring(7);
+        const currentNumber: number = Number(currentNumberAsString);
+        currentModulo = currentNumber % 97;
+    }
+
+    const finalNumberAsString: string = currentModulo + reordered;
+    const finalNumber: number = Number(finalNumberAsString);
+    currentModulo = finalNumber % 97;
+
+    return (currentModulo === 1);
+}
+
+/*
+* DOM modifications
+*/
 
 export function clearSingle(): void {
     singleIBAN.innerHTML = "";
