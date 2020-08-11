@@ -414,28 +414,42 @@ const errorCodeTooShort: string = "IBAN is too short!";
 const errorCodeTooLong: string = "IBAN is too long!";
 const errorInvalidChecksum: string = "Invalid checksum!";
 
+const searchParams: string = window.location.search;
+const parameters: URLSearchParams = new URLSearchParams(searchParams);
+
+if (parameters.has('iban')) {
+    const inputIBAN: string = parameters.get('iban')!;
+    const ibanCodeInput = <HTMLInputElement>ibanCode;
+    ibanCodeInput.value = inputIBAN;
+    testSingleIBAN(inputIBAN);
+}
+
 /** 
  * Init ends
  */
 
 export function testIBAN(event: Event): void {
-    let inputString: string = (<HTMLInputElement>event.target).value;
-    if (inputString) {
+    const inputString: string = (<HTMLInputElement>event.target).value;
+    testSingleIBAN(inputString);
+}
+
+export function testSingleIBAN(input: string): void {
+    if (input) {
         // Remove all whitespace
-        inputString = inputString.replace(/\s/g, "");
+        input = input.replace(/\s/g, "");
 
         // Write IBAN
-        writeSingleIBAN(makeStringSafe(inputString));
+        writeSingleIBAN(makeStringSafe(input));
 
         // Only alphanumericals are allowed
-        if (!inputString.match(/^[0-9A-Z ]+$/)) {
+        if (!input.match(/^[0-9A-Z ]+$/)) {
             writeSingleIsValid(crossMarkEmoji);
             writeSingleCountry("");
             writeSingleError(errorAlphaNumericals);
             return;
         }
 
-        const country: Country = figureOutCountry(inputString);
+        const country: Country = figureOutCountry(input);
         if (country === Country.Unknown) {
             writeSingleIsValid(crossMarkEmoji);
             writeSingleCountry("");
@@ -446,7 +460,7 @@ export function testIBAN(event: Event): void {
             writeSingleCountry(countryToDefinitionMap[country]?.name!);
         }
 
-        const lengthCheckResult: LengthCheckResult = checkLength(inputString, country);
+        const lengthCheckResult: LengthCheckResult = checkLength(input, country);
         if (lengthCheckResult === LengthCheckResult.NotEnough) {
             writeSingleIsValid(crossMarkEmoji);
             writeSingleError(errorCodeTooShort);
@@ -457,7 +471,7 @@ export function testIBAN(event: Event): void {
             return;
         }
 
-        if (!checkChecksum(inputString)) {
+        if (!checkChecksum(input)) {
             writeSingleIsValid(crossMarkEmoji);
             writeSingleError(errorInvalidChecksum);
             return;
@@ -465,11 +479,10 @@ export function testIBAN(event: Event): void {
 
         writeSingleIsValid(checkMarkEmoji);
         writeSingleError("");
-    } 
+    }
     else {
         clearSingle();
-    } 
-       
+    }
 }
 
 export function figureOutCountry(input: string) : Country {
