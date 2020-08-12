@@ -426,11 +426,6 @@ if (multiModeLink) {
     multiModeLinkInput.addEventListener('click', () => selectMultiMode());
 }
 
-const singleIBAN: HTMLElement = document.getElementById('singleIBAN')!;
-const singleIsValid: HTMLElement = document.getElementById('singleIsValid')!;
-const singleCountry: HTMLElement = document.getElementById('singleCountry')!;
-const singleError: HTMLElement = document.getElementById('singleError')!;
-
 const checkMarkEmoji: string = "✔️";
 const crossMarkEmoji: string = "❌";
 
@@ -440,15 +435,26 @@ const errorCodeTooShort: string = "IBAN is too short!";
 const errorCodeTooLong: string = "IBAN is too long!";
 const errorInvalidChecksum: string = "Invalid checksum!";
 
+const clonedTableRows: Array<Node> = [];
+const cloneThisForTable: HTMLElement = document.getElementById('cloneThisForTable')!;
+
 const searchParams: string = window.location.search;
 const parameters: URLSearchParams = new URLSearchParams(searchParams);
 
 if (parameters.has('iban')) {
     const inputIBAN: string = parameters.get('iban')!;
-    const ibanCodeInput = <HTMLInputElement>ibanCode;
-    ibanCodeInput.value = inputIBAN;
-    selectSingleMode();
-    testSingleIBAN(inputIBAN);
+    if (inputIBAN.includes(",")) {
+        const ibanCodesInput = <HTMLInputElement>ibanCodes;
+        ibanCodesInput.value = inputIBAN;
+        selectMultiMode();
+        testMultipleIBAN(inputIBAN);
+    }
+    else {
+        const ibanCodeInput = <HTMLInputElement>ibanCode;
+        ibanCodeInput.value = inputIBAN;
+        selectSingleMode();
+        testSingleIBAN(inputIBAN, cloneThisForTable);
+    }
 }
 else
 {
@@ -462,63 +468,73 @@ else
 
 export function testIBAN(event: Event): void {
     const inputString: string = (<HTMLInputElement>event.target).value;
-    testSingleIBAN(inputString);
+    testSingleIBAN(inputString, cloneThisForTable);
 }
 
 export function testIBANs(event: Event): void {
     const inputString: string = (<HTMLInputElement>event.target).value;
-    testSingleIBAN(inputString);
+    testMultipleIBAN(inputString);
 }
 
-export function testSingleIBAN(input: string): void {
+export function testSingleIBAN(input: string, parent: HTMLElement): void {
     if (input) {
         // Remove all whitespace
         input = input.replace(/\s/g, "");
 
         // Write IBAN
-        writeSingleIBAN(makeStringSafe(input));
+        writeSingleIBAN(makeStringSafe(input), parent);
 
         // Only alphanumericals are allowed
         if (!input.match(/^[0-9A-Z ]+$/)) {
-            writeSingleIsValid(crossMarkEmoji);
-            writeSingleCountry("");
-            writeSingleError(errorAlphaNumericals);
+            writeSingleIsValid(crossMarkEmoji, parent);
+            writeSingleCountry("", parent);
+            writeSingleError(errorAlphaNumericals, parent);
             return;
         }
 
         const country: Country = figureOutCountry(input);
         if (country === Country.Unknown) {
-            writeSingleIsValid(crossMarkEmoji);
-            writeSingleCountry("");
-            writeSingleError(errorCountry);
+            writeSingleIsValid(crossMarkEmoji, parent);
+            writeSingleCountry("", parent);
+            writeSingleError(errorCountry, parent);
             return;
         }
         else {
-            writeSingleCountry(countryToDefinitionMap[country]?.name!);
+            writeSingleCountry(countryToDefinitionMap[country]?.name!, parent);
         }
 
         const lengthCheckResult: LengthCheckResult = checkLength(input, country);
         if (lengthCheckResult === LengthCheckResult.NotEnough) {
-            writeSingleIsValid(crossMarkEmoji);
-            writeSingleError(errorCodeTooShort);
+            writeSingleIsValid(crossMarkEmoji, parent);
+            writeSingleError(errorCodeTooShort, parent);
             return;
         } else if (lengthCheckResult === LengthCheckResult.TooMuch) {
-            writeSingleIsValid(crossMarkEmoji);
-            writeSingleError(errorCodeTooLong);
+            writeSingleIsValid(crossMarkEmoji, parent);
+            writeSingleError(errorCodeTooLong, parent);
             return;
         }
 
         if (!checkChecksum(input)) {
-            writeSingleIsValid(crossMarkEmoji);
-            writeSingleError(errorInvalidChecksum);
+            writeSingleIsValid(crossMarkEmoji, parent);
+            writeSingleError(errorInvalidChecksum, parent);
             return;
         }
 
-        writeSingleIsValid(checkMarkEmoji);
-        writeSingleError("");
+        writeSingleIsValid(checkMarkEmoji, parent);
+        writeSingleError("", parent);
     }
     else {
-        clearSingle();
+        clearSingle(parent);
+    }
+}
+
+export function testMultipleIBAN(input: string): void {
+    const splitted: string[] = input.split(',');
+    const onlyValues: string[] = splitted.filter(x => x);
+
+    createEnoughTableRows(onlyValues.length);
+    for (let i = 0; i < onlyValues.length; i++) {
+        testSingleIBAN(onlyValues[i], clonedTableRows[i] as HTMLElement);
     }
 }
 
@@ -619,25 +635,47 @@ export function selectMultiMode(): void {
     multimodeselectedparent.hidden = false;
 }
 
-export function clearSingle(): void {
-    singleIBAN.innerHTML = "";
-    singleIsValid.innerHTML = "";
-    singleCountry.innerHTML = "";
-    singleError.innerHTML = "";
+export function clearSingle(parent: HTMLElement): void {
+    writeSingleIBAN("", parent);
+    writeSingleIsValid("", parent);
+    writeSingleCountry("", parent);
+    writeSingleError("", parent);
 }
 
-export function writeSingleIBAN(iban: string): void {
-    singleIBAN.innerHTML = iban;
+export function writeSingleIBAN(iban: string, parent: HTMLElement): void {
+    const ibanElement: HTMLElement = parent.querySelector("#IBAN")! as HTMLElement;
+    ibanElement.innerHTML = iban;
 }
 
-export function writeSingleIsValid(isValid: string): void {
-    singleIsValid.innerHTML = isValid;
+export function writeSingleIsValid(isValid: string, parent: HTMLElement): void {
+    const isValidElement: HTMLElement = parent.querySelector("#IsValid")! as HTMLElement;
+    isValidElement.innerHTML = isValid;
 }
 
-export function writeSingleCountry(country: string): void {
-    singleCountry.innerHTML = country;
+export function writeSingleCountry(country: string, parent: HTMLElement): void {
+    const countryElement: HTMLElement = parent.querySelector("#Country")! as HTMLElement;
+    countryElement.innerHTML = country;
 }
 
-export function writeSingleError(error: string): void {
-    singleError.innerHTML = error;
+export function writeSingleError(error: string, parent: HTMLElement): void {
+    const errorElement: HTMLElement = parent.querySelector("#Error")! as HTMLElement;
+    errorElement.innerHTML = error;
+}
+
+export function createEnoughTableRows(wanted: number): void {
+    if (wanted > clonedTableRows.length) {
+        while (wanted > clonedTableRows.length) {
+            const clone = cloneThisForTable.cloneNode(true);
+            cloneThisForTable.before(clone);
+            const cloneHTMLElement: HTMLElement = clone as HTMLElement;
+            cloneHTMLElement.id = ""; 
+            clonedTableRows.push(clone);
+        }
+    } 
+    else if (wanted < clonedTableRows.length) {
+        while (wanted < clonedTableRows.length) {
+            const child: Node = clonedTableRows.pop()!;
+            child.parentNode?.removeChild(child);  
+        }
+    }
 }
