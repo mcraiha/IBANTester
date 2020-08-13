@@ -622,6 +622,8 @@ export function selectSingleMode(): void {
 
     singlemodeselectedparent.hidden = false;
     multimodeselectedparent.hidden = true;
+
+    createEnoughTableRows(0);
 }
 
 export function selectMultiMode(): void {
@@ -633,6 +635,8 @@ export function selectMultiMode(): void {
 
     singlemodeselectedparent.hidden = true;
     multimodeselectedparent.hidden = false;
+
+    clearSingle(cloneThisForTable);
 }
 
 export function clearSingle(parent: HTMLElement): void {
