@@ -462,6 +462,8 @@ else
     selectSingleMode();
 }
 
+fillBuildInfo('buildinfo', buildDate, gitShortHash);
+
 /** 
  * Init ends
  */
@@ -682,4 +684,9 @@ export function createEnoughTableRows(wanted: number): void {
             child.parentNode?.removeChild(child);  
         }
     }
+}
+
+export function fillBuildInfo(elementName: string, day: string, shortHash: string): void {
+    const buildElement: HTMLElement = document.getElementById(elementName)!;
+    buildElement.innerHTML = `${day} <a href="https://github.com/mcraiha/IBANTester/commit/${shortHash}">#${shortHash}</a>`;
 }
