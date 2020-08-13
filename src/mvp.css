@@ -382,7 +382,7 @@ table {
 table td,
 table th,
 table tr {
-    padding: 0.4rem 0.8rem;
+    padding: 0.3rem 0.5rem;
     text-align: var(--justify-important);
 }
 
