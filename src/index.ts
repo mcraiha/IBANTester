@@ -386,6 +386,13 @@ const ibanCharToNumberMap: ibanCharToNumber = {
     "Z": "35",
 };
 
+interface IBANCheckResult {
+    ibanWithoutWhitespace: string;
+    isValidChar: string;
+    country: string;
+    possibleError: string;
+}
+
 /** 
  * Init begins
  */
@@ -426,6 +433,21 @@ if (multiModeLink) {
     multiModeLinkInput.addEventListener('click', () => selectMultiMode());
 }
 
+const htmlmodeselectedparent: HTMLElement = document.getElementById('htmlselectedparent')!;
+const csvmodeselectedparent: HTMLElement = document.getElementById('csvselectedparent')!;
+
+const htmlModeLink: HTMLElement = document.getElementById('htmllink')!;
+if (htmlModeLink) {
+    const htmlModeLinkInput = <HTMLInputElement>htmlModeLink;
+    htmlModeLinkInput.addEventListener('click', () => selectHTMLOutput());
+}
+
+const csvModeLink: HTMLElement = document.getElementById('csvlink')!;
+if (csvModeLink) {
+    const csvModeLinkInput = <HTMLInputElement>csvModeLink;
+    csvModeLinkInput.addEventListener('click', () => selectCSVOutput());
+}
+
 const checkMarkEmoji: string = "✔️";
 const crossMarkEmoji: string = "❌";
 
@@ -462,6 +484,8 @@ else
     selectSingleMode();
 }
 
+selectHTMLOutput();
+
 fillBuildInfo('buildinfo', buildDate, gitShortHash);
 
 /** 
@@ -479,55 +503,65 @@ export function testIBANs(event: Event): void {
 }
 
 export function testSingleIBAN(input: string, parent: HTMLElement): void {
-    if (input) {
-        // Remove all whitespace
-        input = input.replace(/\s/g, "");
+    let checkValue: IBANCheckResult = actualTestSingleIBAN(input);
 
-        // Write IBAN
-        writeSingleIBAN(makeStringSafe(input), parent);
-
-        // Only alphanumericals are allowed
-        if (!input.match(/^[0-9A-Z ]+$/)) {
-            writeSingleIsValid(crossMarkEmoji, parent);
-            writeSingleCountry("", parent);
-            writeSingleError(errorAlphaNumericals, parent);
-            return;
-        }
-
-        const country: Country = figureOutCountry(input);
-        if (country === Country.Unknown) {
-            writeSingleIsValid(crossMarkEmoji, parent);
-            writeSingleCountry("", parent);
-            writeSingleError(errorCountry, parent);
-            return;
-        }
-        else {
-            writeSingleCountry(countryToDefinitionMap[country]?.name!, parent);
-        }
-
-        const lengthCheckResult: LengthCheckResult = checkLength(input, country);
-        if (lengthCheckResult === LengthCheckResult.NotEnough) {
-            writeSingleIsValid(crossMarkEmoji, parent);
-            writeSingleError(errorCodeTooShort, parent);
-            return;
-        } else if (lengthCheckResult === LengthCheckResult.TooMuch) {
-            writeSingleIsValid(crossMarkEmoji, parent);
-            writeSingleError(errorCodeTooLong, parent);
-            return;
-        }
-
-        if (!checkChecksum(input)) {
-            writeSingleIsValid(crossMarkEmoji, parent);
-            writeSingleError(errorInvalidChecksum, parent);
-            return;
-        }
-
-        writeSingleIsValid(checkMarkEmoji, parent);
-        writeSingleError("", parent);
+    if (checkValue.ibanWithoutWhitespace) {
+        writeSingleEntry(checkValue.ibanWithoutWhitespace, checkValue.isValidChar, checkValue.country, checkValue.possibleError, parent);
     }
     else {
         clearSingle(parent);
     }
+}
+
+export function actualTestSingleIBAN(input: string): IBANCheckResult {
+    let returnValue: IBANCheckResult = {} as IBANCheckResult;
+    if (input) {
+        // Remove all whitespace
+        input = input.replace(/\s/g, "");
+        // Remove dangerous characters from IBAN (if there are any)
+        returnValue.ibanWithoutWhitespace = makeStringSafe(input);
+        returnValue.isValidChar = crossMarkEmoji;
+        returnValue.country = "";
+
+        // Only alphanumericals are allowed
+        if (!input.match(/^[0-9A-Z ]+$/)) {
+            returnValue.possibleError = errorAlphaNumericals;
+            return returnValue;
+        }
+
+        const country: Country = figureOutCountry(input);
+        if (country === Country.Unknown) {
+            returnValue.possibleError = errorCountry;
+            return returnValue;
+        }
+
+        returnValue.country = countryToDefinitionMap[country]?.name!;
+
+        const lengthCheckResult: LengthCheckResult = checkLength(input, country);
+        if (lengthCheckResult === LengthCheckResult.NotEnough) {
+            returnValue.possibleError = errorCodeTooShort;
+            return returnValue;
+        } else if (lengthCheckResult === LengthCheckResult.TooMuch) {
+            returnValue.possibleError = errorCodeTooLong;
+            return returnValue;
+        }
+
+        if (!checkChecksum(input)) {
+            returnValue.possibleError = errorInvalidChecksum;
+            return returnValue;
+        }
+
+        // SUCCESS POINT
+        returnValue.isValidChar = checkMarkEmoji;
+        returnValue.possibleError = "";
+        return returnValue;
+    }
+    
+    return returnValue;
+}
+
+export function renderHTMLForSingleIBAN(input: IBANCheckResult, parent: HTMLElement) {
+    writeSingleEntry(input.ibanWithoutWhitespace, input.isValidChar, input.country, input.possibleError, parent);
 }
 
 export function testMultipleIBAN(input: string): void {
@@ -612,6 +646,32 @@ export function makeStringSafe(syote: string): string {
 }
 
 /*
+* CSV related operations
+*/
+
+export function copyCSVToClipboard(): void {
+
+}
+
+export function saveCSVToFile(): void {
+
+}
+
+export function generateCSVText(ibans: string[]): string {
+    const firstLine: string = "IBAN, Is valid, Country, Error";
+    const checkedIbans: Array<string> = [];
+    for (const iban of ibans) {
+        const result: IBANCheckResult = actualTestSingleIBAN(iban);
+        if (result.ibanWithoutWhitespace) {
+            checkedIbans.push(`${result.ibanWithoutWhitespace}, ${result.isValidChar}, ${result.country}, ${result.possibleError}`);
+        }
+        
+    }
+    
+    return `${firstLine}\r\n${checkedIbans.join("\r\n")}`;
+}
+
+/*
 * DOM modifications
 */
 
@@ -641,11 +701,25 @@ export function selectMultiMode(): void {
     clearSingle(cloneThisForTable);
 }
 
+export function selectHTMLOutput(): void {
+    htmlmodeselectedparent.hidden = false;
+    csvmodeselectedparent.hidden = true;
+}
+
+export function selectCSVOutput(): void {
+    htmlmodeselectedparent.hidden = true;
+    csvmodeselectedparent.hidden = false;
+}
+
 export function clearSingle(parent: HTMLElement): void {
-    writeSingleIBAN("", parent);
-    writeSingleIsValid("", parent);
-    writeSingleCountry("", parent);
-    writeSingleError("", parent);
+    writeSingleEntry("", "", "", "", parent);
+}
+
+export function writeSingleEntry(iban: string, isValid: string, country: string, error: string, parent: HTMLElement): void {
+    writeSingleIBAN(iban, parent);
+    writeSingleIsValid(isValid, parent);
+    writeSingleCountry(country, parent);
+    writeSingleError(error, parent);
 }
 
 export function writeSingleIBAN(iban: string, parent: HTMLElement): void {
