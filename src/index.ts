@@ -633,9 +633,9 @@ export function checkChecksum(input: string): boolean {
     return (currentModulo === 1);
 }
 
-export function makeStringSafe(syote: string): string {
+export function makeStringSafe(input: string): string {
     const removeThese: string[] = ["\\<", "\\>", "\\[", "\\]", '\\"'];
-    let modify: string = syote;
+    let modify: string = input;
     
     for (const remove of removeThese) {
         const removeRegExp: RegExp = new RegExp(remove, 'g');
