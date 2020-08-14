@@ -47,10 +47,10 @@
 
       <hr>
 
-      <section>
-        <p id="htmlselectedparent">
-          <small><b>HTML</b> / <a id="csvlink">CSV</a></small>
-          <br>
+      <section id="htmlselectedparent">
+        <header>
+          <h5><b>HTML</b> / <a id="csvlink">CSV</a></h5>
+        </header>
           <table>
             <thead>
               <tr>
@@ -68,14 +68,16 @@
                   <td id="Error"></td>
               </tr>
             </tbody>
-          </table>
-        </p>
-        <p id="csvselectedparent">
-          <small><a id="htmllink">HTML</a> / <b>CSV</b></small>
-          <br>
-          Text area here
-        </p>
-        
+          </table>  
+      </section>
+      <section id="csvselectedparent">
+        <header>
+          <h5><a id="htmllink">HTML</a> / <b>CSV</b></h5>
+        </header>
+          <form>
+            <label id="csvLabel" for="csv" title="CSV text">CSV text:</label>
+            <textarea id="csv" readonly></textarea>
+          </form>
       </section>
 
     </main>
