@@ -460,6 +460,17 @@ const errorInvalidChecksum: string = "Invalid checksum!";
 const clonedTableRows: Array<Node> = [];
 const cloneThisForTable: HTMLElement = document.getElementById('cloneThisForTable')!;
 
+const csvTextArea: HTMLElement = document.getElementById('csv')!;
+const csvTextAreaInput: HTMLInputElement = <HTMLInputElement>csvTextArea;
+
+const copycsvButton: HTMLElement = document.getElementById('copycsv')!;
+const copycsvButtonInput = <HTMLInputElement>copycsvButton;
+copycsvButtonInput.onclick = copyCSVToClipboard;
+
+const savecsvButton: HTMLElement = document.getElementById('savecsv')!;
+const savecsvButtonInput = <HTMLInputElement>savecsvButton;
+savecsvButtonInput.onclick = saveCSVToFile;
+
 const searchParams: string = window.location.search;
 const parameters: URLSearchParams = new URLSearchParams(searchParams);
 
@@ -507,9 +518,34 @@ export function testSingleIBAN(input: string, parent: HTMLElement): void {
 
     if (checkValue.ibanWithoutWhitespace) {
         writeSingleEntry(checkValue.ibanWithoutWhitespace, checkValue.isValidChar, checkValue.country, checkValue.possibleError, parent);
+        csvTextAreaInput.value = generateCSVText([checkValue]);
     }
     else {
         clearSingle(parent);
+        csvTextAreaInput.value = "";
+    }
+}
+
+export function testMultipleIBAN(input: string): void {
+    const splitted: string[] = input.split(',');
+    const onlyValues: string[] = splitted.filter(x => x);
+    const checkResults: Array<IBANCheckResult> = [];
+
+    for (const value of onlyValues) {
+        checkResults.push(actualTestSingleIBAN(value));
+    }
+
+    createEnoughTableRows(onlyValues.length);
+    for (let i = 0; i < onlyValues.length; i++) {
+        let checkValue: IBANCheckResult = checkResults[i];
+        writeSingleEntry(checkValue.ibanWithoutWhitespace, checkValue.isValidChar, checkValue.country, checkValue.possibleError, clonedTableRows[i] as HTMLElement);
+    }
+
+    if (checkResults.length < 1) {
+        csvTextAreaInput.value = "";
+    } 
+    else {
+        csvTextAreaInput.value = generateCSVText(checkResults);
     }
 }
 
@@ -562,16 +598,6 @@ export function actualTestSingleIBAN(input: string): IBANCheckResult {
 
 export function renderHTMLForSingleIBAN(input: IBANCheckResult, parent: HTMLElement) {
     writeSingleEntry(input.ibanWithoutWhitespace, input.isValidChar, input.country, input.possibleError, parent);
-}
-
-export function testMultipleIBAN(input: string): void {
-    const splitted: string[] = input.split(',');
-    const onlyValues: string[] = splitted.filter(x => x);
-
-    createEnoughTableRows(onlyValues.length);
-    for (let i = 0; i < onlyValues.length; i++) {
-        testSingleIBAN(onlyValues[i], clonedTableRows[i] as HTMLElement);
-    }
 }
 
 export function figureOutCountry(input: string) : Country {
@@ -650,18 +676,26 @@ export function makeStringSafe(input: string): string {
 */
 
 export function copyCSVToClipboard(): void {
-
+    csvTextAreaInput.select();
+    document.execCommand("copy");
 }
 
 export function saveCSVToFile(): void {
+    const filename: string = "iban.csv";
+    const file: Blob = new Blob([csvTextAreaInput.value], {type: 'text/plain'});
 
+    const a = document.createElement('a');
+    a.href= URL.createObjectURL(file);
+    a.download = filename;
+    a.click();
+
+	URL.revokeObjectURL(a.href);
 }
 
-export function generateCSVText(ibans: string[]): string {
+export function generateCSVText(ibanCheckResults: IBANCheckResult[]): string {
     const firstLine: string = "IBAN, Is valid, Country, Error";
     const checkedIbans: Array<string> = [];
-    for (const iban of ibans) {
-        const result: IBANCheckResult = actualTestSingleIBAN(iban);
+    for (const result of ibanCheckResults) {
         if (result.ibanWithoutWhitespace) {
             checkedIbans.push(`${result.ibanWithoutWhitespace}, ${result.isValidChar}, ${result.country}, ${result.possibleError}`);
         }
