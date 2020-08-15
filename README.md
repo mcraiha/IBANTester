@@ -1,15 +1,15 @@
 # IBANTester
-Test validity of IBAN codes in your web browser
+Test validity of IBAN codes in your web browser. Powered by HTML5 and Javascript/Typescript.
 
 ## Live
-iban.raiha.rocks (not yet)
+[https://iban.raiha.rocks](https://iban.raiha.rocks)
 
 ## Build status
 ![](https://github.com/mcraiha/IBANTester/workflows/BuildAndPublish/badge.svg)
 
 ## How to compile
 
-Go to **src** folder and type `tsc`. **index.js** will be generated to **src/dist** folder
+Go to **src** folder and type `tsc` for compile. **index.js** will be generated to **src/dist** folder
 
 ## Licenses
 Text in this document and source code files are released into the public domain. See [LICENSE](https://github.com/mcraiha/IBANTester/blob/master/LICENSE) file.  
