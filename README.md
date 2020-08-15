@@ -5,6 +5,7 @@ Test validity of IBAN codes in your web browser
 iban.raiha.rocks (not yet)
 
 ## Build status
+![](https://github.com/mcraiha/IBANTester/workflows/BuildAndPublish/badge.svg)
 
 ## How to compile
 
