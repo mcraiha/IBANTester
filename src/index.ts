@@ -571,7 +571,7 @@ export function actualTestSingleIBAN(input: string): IBANCheckResult {
             return returnValue;
         }
 
-        const countryflag: HTMLElement = document.getElementById(Country[country])!;
+        const countryName: HTMLElement = document.getElementById(Country[country])!;
         returnValue.country = countryName.innerText;
 
         const lengthCheckResult: LengthCheckResult = checkLength(input, country);
@@ -682,7 +682,7 @@ export function copyCSVToClipboard(): void {
 }
 
 export function saveCSVToFile(): void {
-    const fileflag: string = "iban.csv";
+    const filename: string = "iban.csv";
     const file: Blob = new Blob([csvTextAreaInput.value], {type: 'text/plain'});
 
     const a = document.createElement('a');
@@ -795,7 +795,7 @@ export function createEnoughTableRows(wanted: number): void {
     }
 }
 
-export function fillBuildInfo(elementflag: string, day: string, shortHash: string): void {
+export function fillBuildInfo(elementName: string, day: string, shortHash: string): void {
     const buildElement: HTMLElement = document.getElementById(elementName)!;
     buildElement.innerHTML = `${day} <a href="https://github.com/mcraiha/IBANTester/commit/${shortHash}">#${shortHash}</a>`;
 }
