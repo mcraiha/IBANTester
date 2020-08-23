@@ -571,7 +571,8 @@ export function actualTestSingleIBAN(input: string): IBANCheckResult {
             return returnValue;
         }
 
-        returnValue.country = countryToDefinitionMap[country]?.name!;
+        const countryName: HTMLElement = document.getElementById(Country[country])!;
+        returnValue.country = countryName.innerText;
 
         const lengthCheckResult: LengthCheckResult = checkLength(input, country);
         if (lengthCheckResult === LengthCheckResult.NotEnough) {
