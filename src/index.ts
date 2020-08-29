@@ -400,6 +400,8 @@ if ('serviceWorker' in navigator) {
     //navigator.serviceWorker.register('sw.js');
 }
 
+let showCountyFlags: boolean = true;
+
 const ibanCode: HTMLElement = document.getElementById('ibanCode')!;
 if (ibanCode) {
     const ibanCodeInput = <HTMLInputElement>ibanCode;
@@ -446,6 +448,13 @@ const csvModeLink: HTMLElement = document.getElementById('csvlink')!;
 if (csvModeLink) {
     const csvModeLinkInput = <HTMLInputElement>csvModeLink;
     csvModeLinkInput.addEventListener('click', () => selectCSVOutput());
+}
+
+const showFlags: HTMLElement = document.getElementById('showFlags')!;
+if (showFlags) {
+    const showFlagsInput = <HTMLInputElement>showFlags;
+    showFlagsInput.checked = showCountyFlags;
+    showFlagsInput.addEventListener('change', changeShowFlags);
 }
 
 const checkMarkEmoji: string = "✔️";
@@ -573,6 +582,9 @@ export function actualTestSingleIBAN(input: string): IBANCheckResult {
 
         const countryName: HTMLElement = document.getElementById(Country[country])!;
         returnValue.country = countryName.innerText;
+        if (showCountyFlags) {
+            returnValue.country += ` ${countryToDefinitionMap[country]?.flag}`;
+        }
 
         const lengthCheckResult: LengthCheckResult = checkLength(input, country);
         if (lengthCheckResult === LengthCheckResult.NotEnough) {
@@ -744,6 +756,10 @@ export function selectHTMLOutput(): void {
 export function selectCSVOutput(): void {
     htmlmodeselectedparent.hidden = true;
     csvmodeselectedparent.hidden = false;
+}
+
+export function changeShowFlags(event: Event): void {
+    showCountyFlags = (<HTMLInputElement>event.target).checked;
 }
 
 export function clearSingle(parent: HTMLElement): void {
