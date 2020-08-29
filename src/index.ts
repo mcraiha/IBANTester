@@ -401,6 +401,7 @@ if ('serviceWorker' in navigator) {
 }
 
 let showCountyFlags: boolean = true;
+let isSingleMode: boolean = true;
 
 const ibanCode: HTMLElement = document.getElementById('ibanCode')!;
 if (ibanCode) {
@@ -489,14 +490,13 @@ if (parameters.has('iban')) {
         const ibanCodesInput = <HTMLInputElement>ibanCodes;
         ibanCodesInput.value = inputIBAN;
         selectMultiMode();
-        testMultipleIBAN(inputIBAN);
     }
     else {
         const ibanCodeInput = <HTMLInputElement>ibanCode;
         ibanCodeInput.value = inputIBAN;
         selectSingleMode();
-        testSingleIBAN(inputIBAN, cloneThisForTable);
     }
+    forceUpdate(inputIBAN, cloneThisForTable);
 }
 else
 {
@@ -511,6 +511,16 @@ fillBuildInfo('buildinfo', buildDate, gitShortHash);
 /** 
  * Init ends
  */
+
+export function forceUpdate(inputIBAN: string, cloneThisForTable: HTMLElement): void {
+    if (isSingleMode) {
+        testSingleIBAN(inputIBAN, cloneThisForTable);
+    }
+    else {
+        // Multimode
+        testMultipleIBAN(inputIBAN);
+    }
+}
 
 export function testIBAN(event: Event): void {
     const inputString: string = (<HTMLInputElement>event.target).value;
@@ -723,6 +733,8 @@ export function generateCSVText(ibanCheckResults: IBANCheckResult[]): string {
 */
 
 export function selectSingleMode(): void {
+    isSingleMode = true;
+
     ibanCodeLabel.hidden = false;
     ibanCode.hidden = false;
 
@@ -736,6 +748,8 @@ export function selectSingleMode(): void {
 }
 
 export function selectMultiMode(): void {
+    isSingleMode = false;
+
     ibanCodeLabel.hidden = true;
     ibanCode.hidden = true;
 
@@ -760,6 +774,8 @@ export function selectCSVOutput(): void {
 
 export function changeShowFlags(event: Event): void {
     showCountyFlags = (<HTMLInputElement>event.target).checked;
+    const inputIBAN: string = isSingleMode ? (<HTMLInputElement>ibanCode).value : (<HTMLInputElement>ibanCodes).value;
+    forceUpdate(inputIBAN, cloneThisForTable);
 }
 
 export function clearSingle(parent: HTMLElement): void {
