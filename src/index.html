@@ -52,7 +52,7 @@
 
       <section id="htmlselectedparent">
         <header>
-          <h5><b>HTML</b> / <a id="csvlink">CSV</a></h5>
+          <h5><b>HTML</b> / <a name="csvlink">CSV</a> / <a name="sharelink">Share</a></h5>
         </header>
           <table>
             <thead>
@@ -75,13 +75,24 @@
       </section>
       <section id="csvselectedparent">
         <header>
-          <h5><a id="htmllink">HTML</a> / <b>CSV</b></h5>
+          <h5><a name="htmllink">HTML</a> / <b>CSV</b> / <a name="sharelink">Share</a></h5>
         </header>
           <form>
             <label id="csvLabel" for="csv" title="CSV text">CSV text:</label>
             <textarea id="csv" rows="5" readonly></textarea>
             <button type="button" id="copycsv">Copy CSV ✂️</button>
             <button type="button" id="savecsv">Save CSV 💾</button>
+          </form>
+      </section>
+      <section id="shareselectedparent">
+        <header>
+          <h5><a name="htmllink">HTML</a> / <a name="csvlink">CSV</a> / <b>Share</b></h5>
+        </header>
+          <form>
+            <label id="shareLabel" for="shareURL" title="Share URL">URL:</label>
+            <input id="shareURL" readonly>
+            <button type="button" id="copyshareurl">Copy URL ✂️</button>
+            <button type="button" id="shareshareurl">Share URL ➡️</button>
           </form>
       </section>
 

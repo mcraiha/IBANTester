@@ -438,17 +438,41 @@ if (multiModeLink) {
 
 const htmlmodeselectedparent: HTMLElement = document.getElementById('htmlselectedparent')!;
 const csvmodeselectedparent: HTMLElement = document.getElementById('csvselectedparent')!;
+const sharemodeselectedparent: HTMLElement = document.getElementById('shareselectedparent')!;
 
-const htmlModeLink: HTMLElement = document.getElementById('htmllink')!;
-if (htmlModeLink) {
-    const htmlModeLinkInput = <HTMLInputElement>htmlModeLink;
-    htmlModeLinkInput.addEventListener('click', () => selectHTMLOutput());
+const htmlModeLinks: NodeList = document.getElementsByName('htmllink')!;
+if (htmlModeLinks) {
+    for (const link of htmlModeLinks) {
+        const htmlModeLinkInput = <HTMLInputElement>link;
+        htmlModeLinkInput.addEventListener('click', () => selectHTMLOutput());
+    }
 }
 
-const csvModeLink: HTMLElement = document.getElementById('csvlink')!;
-if (csvModeLink) {
-    const csvModeLinkInput = <HTMLInputElement>csvModeLink;
-    csvModeLinkInput.addEventListener('click', () => selectCSVOutput());
+const csvModeLinks: NodeList = document.getElementsByName('csvlink')!;
+if (csvModeLinks) {
+    for (const link of csvModeLinks) {
+        const csvModeLinkInput = <HTMLInputElement>link;
+        csvModeLinkInput.addEventListener('click', () => selectCSVOutput());
+    }
+}
+
+const shareModeLinks: NodeList = document.getElementsByName('sharelink')!;
+if (shareModeLinks) {
+    for (const link of shareModeLinks) {
+        const shareModeLinkInput = <HTMLInputElement>link;
+        shareModeLinkInput.addEventListener('click', () => selectShareOutput());
+    }
+}
+
+const passAroundTypescriptLimitation: any = window.navigator;
+const navigatorShareButton: HTMLElement = document.getElementById('shareshareurl')!;
+if (navigatorShareButton) {
+    if (passAroundTypescriptLimitation.canShare) {
+        navigatorShareButton.addEventListener('click', () => callNativeShare());
+    }
+    else {
+        navigatorShareButton.hidden = true;
+    }
 }
 
 const showFlags: HTMLElement = document.getElementById('showFlags')!;
@@ -480,6 +504,13 @@ copycsvButtonInput.onclick = copyCSVToClipboard;
 const savecsvButton: HTMLElement = document.getElementById('savecsv')!;
 const savecsvButtonInput = <HTMLInputElement>savecsvButton;
 savecsvButtonInput.onclick = saveCSVToFile;
+
+const copyUrlShareButton: HTMLElement = document.getElementById('copyshareurl')!;
+const copyUrlShareButtonInput = <HTMLInputElement>copyUrlShareButton;
+copyUrlShareButtonInput.onclick = copyShareUrlToClipboard;
+
+const shareUrlReadonlyCopy: HTMLElement = document.getElementById('shareURL')!;
+const shareUrlReadonlyCopyInput: HTMLInputElement = <HTMLInputElement>shareUrlReadonlyCopy;
 
 const searchParams: string = window.location.search;
 const parameters: URLSearchParams = new URLSearchParams(searchParams);
@@ -538,10 +569,12 @@ export function testSingleIBAN(input: string, parent: HTMLElement): void {
     if (checkValue.ibanWithoutWhitespace) {
         writeSingleEntry(checkValue.ibanWithoutWhitespace, checkValue.isValidChar, checkValue.country, checkValue.possibleError, parent);
         csvTextAreaInput.value = generateCSVText([checkValue]);
+        shareUrlReadonlyCopyInput.value = generateShareURL([checkValue]);
     }
     else {
         clearSingle(parent);
         csvTextAreaInput.value = "";
+        shareUrlReadonlyCopyInput.value = "";
     }
 }
 
@@ -562,9 +595,11 @@ export function testMultipleIBAN(input: string): void {
 
     if (checkResults.length < 1) {
         csvTextAreaInput.value = "";
+        shareUrlReadonlyCopyInput.value = "";
     } 
     else {
         csvTextAreaInput.value = generateCSVText(checkResults);
+        shareUrlReadonlyCopyInput.value = generateShareURL(checkResults);
     }
 }
 
@@ -729,6 +764,33 @@ export function generateCSVText(ibanCheckResults: IBANCheckResult[]): string {
 }
 
 /*
+* Share URL related operations
+*/
+
+export function copyShareUrlToClipboard(): void {
+    shareUrlReadonlyCopyInput.select();
+    document.execCommand("copy");
+}
+
+export function generateShareURL(ibanCheckResults: IBANCheckResult[]): string {
+    const origin: string = window.location.origin;
+    const onlyIBANs: Array<string> = [];
+    for (const result of ibanCheckResults) {
+        onlyIBANs.push(`${result.ibanWithoutWhitespace}`);
+    }
+
+    return `${origin}?iban=${onlyIBANs.join(",")}`;
+}
+
+export function callNativeShare(): void {
+    passAroundTypescriptLimitation.share({
+        title: 'IBAN Tester',
+        text: 'Check out these IBANs',
+        url: shareUrlReadonlyCopyInput.value
+      });
+}
+
+/*
 * DOM modifications
 */
 
@@ -765,11 +827,19 @@ export function selectMultiMode(): void {
 export function selectHTMLOutput(): void {
     htmlmodeselectedparent.hidden = false;
     csvmodeselectedparent.hidden = true;
+    sharemodeselectedparent.hidden = true;
 }
 
 export function selectCSVOutput(): void {
     htmlmodeselectedparent.hidden = true;
     csvmodeselectedparent.hidden = false;
+    sharemodeselectedparent.hidden = true;
+}
+
+export function selectShareOutput(): void {
+    htmlmodeselectedparent.hidden = true;
+    csvmodeselectedparent.hidden = true;
+    sharemodeselectedparent.hidden = false;
 }
 
 export function changeShowFlags(event: Event): void {
