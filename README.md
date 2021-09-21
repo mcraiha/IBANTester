@@ -9,7 +9,7 @@ Test validity of IBAN codes in your web browser. Powered by HTML5 and Javascript
 
 ## How to compile
 
-Go to **src** folder and type `tsc` for compile. **index.js** will be generated to **src/dist** folder
+To bundle fast, use `deno bundle -c tsconfig.json src/index.ts src/index.js` . Or use `fullbundle.sh` to do everything needed
 
 ## Licenses
 Text in this document and source code files are released into the public domain. See [LICENSE](https://github.com/mcraiha/IBANTester/blob/master/LICENSE) file.  
