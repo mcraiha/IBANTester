@@ -539,6 +539,10 @@ selectHTMLOutput();
 
 fillBuildInfo('buildinfo', buildDate, gitShortHash);
 
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+}
+
 /** 
  * Init ends
  */
