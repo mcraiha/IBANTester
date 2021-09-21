@@ -8,8 +8,8 @@ echo $current_date
 echo $tsc_version
 echo $git_short_hash
 
-sed -i "s/{0}/$tsc_version/g" src/index.ts.ts
-sed -i "s/{1}/$git_short_hash/g" src/index.ts.ts
-sed -i "s/{2}/$current_date/g" src/index.ts.ts
+sed -i "s/{0}/$tsc_version/g" src/index.ts
+sed -i "s/{1}/$git_short_hash/g" src/index.ts
+sed -i "s/{2}/$current_date/g" src/index.ts
 
-deno bundle -c tsconfig.json src/index.ts.ts src/index.ts.js
+deno bundle -c tsconfig.json src/index.ts src/index.js
