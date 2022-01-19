@@ -41,8 +41,8 @@ self.addEventListener('fetch', function(event) {
   event.respondWith(
     caches.match(event.request)
       .then(function(response) {
-        // Got hit
-        if (response) {
+        // Got hit (and not a redirected response)
+        if (response && !response.redirected) {
           return response;
         }
 
